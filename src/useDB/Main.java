@@ -26,6 +26,14 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import fromT.Article;
+import fromT.ArticleService;
+import fromT.Board;
+import fromT.Controller;
+import fromT.Factory;
+import fromT.Request;
+import fromT.Util;
+
 public class Main {
 	public static void main(String[] args) {
 		DBConnection dbConn = new DBConnection();
@@ -241,7 +249,7 @@ class Request {
 
 //Controller
 abstract class Controller {
-	abstract void doAction(Request reqeust);
+	abstract void doAction(Request request);
 }
 
 class ArticleController extends Controller {
@@ -251,41 +259,104 @@ class ArticleController extends Controller {
 		articleService = Factory.getArticleService();
 	}
 
-	public void doAction(Request reqeust) {
-		if (reqeust.getActionName().equals("list")) {
-			actionList(reqeust);
-		} else if (reqeust.getActionName().equals("write")) {
-			actionWrite(reqeust);
+	public void doAction(Request request) {
+		if (request.getActionName().equals("list")) {
+				actionList();
+		} else if (request.getActionName().equals("write")) {
+			actionWrite(request);
+		} else if (request.getActionName().equals("modify")) {
+			if (request.getArg1() == null) {
+				System.out.println("게시물 번호를 입력해 주세요.");
+			} else {
+				int num = Integer.parseInt(request.getArg1());
+				actionModify(num);
+			}
+		} else if (request.getActionName().equals("detail")) {
+			if (request.getArg1() == null) {
+				System.out.println("게시물 번호를 입력해 주세요.");
+			} else {
+				int num = Integer.parseInt(request.getArg1());
+				actionDetail(num);
+			}
+		} else if (request.getActionName().equals("delete")) {
+			if (request.getArg1() == null) {
+				System.out.println("게시물 번호를 입력해 주세요.");
+			} else {
+				int num = Integer.parseInt(request.getArg1());
+				actionDelete(num);
+			}
+		} else if (request.getActionName().equals("changeboard")) {
+			if (request.getArg1() == null) {
+				System.out.println("게시판 번호를 입력해 주세요.");
+			} else {
+				int num = Integer.parseInt(request.getArg1());
+				actionChangeBoard(num);
+			}
 		}
 	}
 
-	private void actionList(Request reqeust) {
+	private void actionChangeBoard(int num) {
+
+		int id = Factory.getSession().getCurrentBoard().getId();
+		if (id != Factory.getArticleService().getBoard(num).getId()) {
+			Factory.getSession().setCurrentBoard(Factory.getArticleService().getBoard(num));
+			Board board = Factory.getSession().getCurrentBoard();
+			System.out.printf("%s (으)로 변경되었습니다.%n", board.getName());
+		} else {
+			System.out.println("현재 사용중인 게시판 입니다.");
+		} // 게시판 중복메시지 안뜸
+	}
+
+	private void actionDelete(int num) {
+		articleService.deleteArticleById(num);
+	}
+
+	private void actionDetail(int num) {
+		Article article = articleService.getArticlebyId(num);
+		System.out.println(article);
+	}
+
+	private void actionModify(int num) {
+		String title;
+		String body;
+		if (Factory.getSession().isLogined() == true) {
+			Article article = Factory.getArticleService().getArticlebyId(num);
+			System.out.printf("제목 : ");
+			title = Factory.getScanner().nextLine();
+			System.out.printf("내용 : ");
+			body = Factory.getScanner().nextLine();
+			articleService.modify(num, title, body);
+		}
+	}
+
+		private List<Article> actionList() {
 		List<Article> articles = articleService.getArticles();
-
-		System.out.println("== 게시물 리스트 시작 ==");
-		for (Article article : articles) {
-			System.out.printf("%d, %s, %s\n", article.getId(), article.getRegDate(), article.getTitle());
+	
+		for (int i = 0; i < articles.size(); i++) {
+			if (i >= articles.size()) {
+				break;
+			} else {
+				System.out.println(articles.get(i));
+			}
 		}
-		System.out.println("== 게시물 리스트 끝 ==");
+		return articles;
 	}
 
-	private void actionWrite(Request reqeust) {
-		System.out.printf("제목 : ");
-		String title = Factory.getScanner().nextLine();
-		System.out.printf("내용 : ");
-		String body = Factory.getScanner().nextLine();
+	private void actionWrite(Request request) {
+			System.out.printf("제목 : ");
+			String title = Factory.getScanner().nextLine();
+			System.out.printf("내용 : ");
+			String body = Factory.getScanner().nextLine();
 
-		// 현재 게시판 id 가져오기
-		int boardId = Factory.getSession().getCurrentBoard().getId();
+// 현재 게시판 id 가져오기
+			int boardId = Factory.getSession().getCurrentBoard().getId();
 
-		// 현재 로그인한 회원의 id 가져오기
-		int memberId = Factory.getSession().getLoginedMember().getId();
-		int newId = articleService.write(boardId, memberId, title, body);
+// 현재 로그인한 회원의 id 가져오기
+			int newId = articleService.write(boardId,title, body);
 
-		System.out.printf("%d번 글이 생성되었습니다.\n", newId);
+			System.out.printf("%d번 글이 생성되었습니다.\n", newId);
 	}
 }
-
 class BuildController extends Controller {
 	private BuildService buildService;
 
@@ -395,7 +466,7 @@ class ArticleService {
 		return articleDao.getBoard(id);
 	}
 
-	public int write(int boardId, int memberId, String title, String body) {
+	public int write(int boardId, String title, String body) {
 		Article article = new Article(boardId, memberId, title, body);
 		return articleDao.save(article);
 	}
