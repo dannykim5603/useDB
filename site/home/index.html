@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>whaaaaat?</title>
+  <style>
+    body,
+    body,
+    ul,
+    li {
+      margin: 0%;
+      padding: 0%;
+      list-style: none;
+    }
+
+    body {
+      background-image: url("https://i.pinimg.com/originals/85/28/a8/8528a8d1722dabfe66424c870a995006.jpg");
+    }
+
+    a {
+      text-decoration: none;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 7px;
+    }
+
+    .menu-box-1 {
+      position: relative;
+      top: 100px;
+      bottom: auto;
+      text-align: center;
+    }
+
+    .menu-box-1 ul {
+      display: inline-block;
+      /* border: white solid 2px; */
+    }
+
+    .menu-box-1 ul>li {
+      display: inline-block;
+      position: relative;
+      padding: 0 10px;
+    }
+
+    .menu-box-1 ul ul {
+      display: none;
+      position: absolute;
+      top: 0;
+    }
+
+    .menu-box-1 ul>li>a {
+      transition: 0.2s;
+      display: block;
+      padding: 10px;
+      width: 250px;
+    }
+
+    .menu-box-1 ul>li:hover>a {
+      color: black;
+      transition: 0.5s opacity 1s;
+      /* width: 150px; */
+    }
+
+    .menu-box-1 ul>li:hover>ul {
+      display: block;
+      top: 100%;
+      right: 0;
+      left: auto;
+    }
+
+  </style>
+</head>
+
+<body>
+  <nav class="menu-box-1">
+    <ul>
+      <li>
+        <a href="../home/index.html">홈</a>
+      </li>
+      <li>
+        <a href="#">게시판</a>
+        <ul>
+          <li><a href="../../site/article/notice-list-1.html">공지 게시판</a></li>
+          <li><a href="../../site/article/free-list-1.html">자유 게시판</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">통계</a>
+      </li>
+      <li>
+        <a href="#">개발자 블로그</a>
+        <ul>
+          <li>
+            <a href="https://to2.kr/bfp" target="_blank">이상범 블로그</a>
+          </li>
+          <li>
+            <a href="https://to2.kr/bfe" target="_blank">김동연 블로그</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+<table class="first" border=" 1 ">
+    <style>
+        th {
+            color: white;
+        }
+
+        .first {
+            position: absolute;
+            width: 40%;
+            height: auto;
+            margin-left: auto;
+            margin-right: auto;
+            top: 50%;
+            bottom: auto;
+            left: 10%;
+        }
+
+        .first>thead {
+            text-align: center;
+        }
+
+        .first>thead>tr {
+            padding: 150 0px;
+        }
+
+        .first>thead>tr>th {
+            text-align: center;
+        }
+
+        .first>tbody {
+            text-align: center;
+        }
+
+        .first>tbody>tr>td {
+            color: white;
+        }
+
+        .center-text {
+            position: relative;
+            top: 300px;
+            text-align: center;
+            display: block;
+            color: #de7e73;
+            font-size: 40px;
+            transition: 0.5s;
+        }
+
+        .center-text:hover {
+            transition: 0.5s;
+            opacity: 0.9;
+            color: white;
+        }
+    </style>
+
+    <div class="center-text">Life of a Developer</div>
+    <thead>
+        <tr>
+            <th>번호</th>
+            <th>날짜</th>
+            <th>작성자</th>
+            <th>제목</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr><td>1</td><td>2020-06-16 17:01:48</td><td>1</td><td><a href="../article/1.html">11</a></div></tr>
+    </tbody>
+</table>  </body>
+</html>

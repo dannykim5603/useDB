@@ -1,0 +1,67 @@
+body,
+ul,
+li {
+  margin: 0%;
+  padding: 0%;
+  list-style: none;
+}
+
+body {
+  background-image: url("https://i.pinimg.com/originals/85/28/a8/8528a8d1722dabfe66424c870a995006.jpg");
+}
+
+a {
+  text-decoration: none;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 7px;
+}
+
+.menu-box-1 {
+  position: relative;
+  top: 100px;
+  bottom: auto;
+  text-align: center;
+}
+
+.menu-box-1 ul {
+  display: inline-block;
+  /* border: white solid 2px; */
+}
+.menu-box-1 ul > li {
+  display: inline-block;
+  position: relative;
+  padding: 0 10px;
+}
+
+.menu-box-1 ul ul {
+  display: none;
+  position: absolute;
+  top: 0;
+}
+.menu-box-1 ul > li > a {
+  display: block;
+  padding: 10px;
+  width: 250px;
+}
+.menu-box-1 ul > li:hover > a {
+  color: black;
+
+  /* width: 150px; */
+}
+.menu-box-1 ul > li:hover > ul {
+  display: block;
+  top: 100%;
+  right: 0;
+  left: auto;
+}
+
+.center-text {
+  position: relative;
+  top: 300px;
+  text-align: center;
+  display: block;
+  color: #de7e73;
+  font-size: 40px;
+}
