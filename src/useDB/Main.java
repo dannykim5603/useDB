@@ -1226,7 +1226,12 @@ class Board extends Dto {
 	}
 
 	public Board(Map<String, Object> row) {
-		this.setId(int);
+		this.setId((int) (long) row.get("id"));
+
+		String regDate = row.get("regDate") + "";
+		this.setRegDate(regDate);
+		this.setName((String) row.get("name"));
+		this.setCode((String) row.get("code"));
 	}
 
 	public String getName() {
