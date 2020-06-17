@@ -559,6 +559,7 @@ class ArticleController extends Controller {
 	}
 
 	private void actionDelete(int num) {
+		
 		articleService.deleteArticleById(num);
 	}
 
@@ -923,14 +924,18 @@ class ArticleDao {
 		sql += String.format("SET regDate = '%s'", article.getRegDate());
 		sql += String.format(", title = '%s'", article.getTitle());
 		sql += String.format(", `body` = '%s'", article.getBody());
-		sql += String.format(", memberId = '%d'", article.getMemberId());
 		sql += String.format(", boardId = '%d'", article.getBoardId());
 
 		return dbConnection.insert(sql);
 	}
 
 	public Board getBoard(int id) {
-		return db.getBoard(id);
+		String sql = "";
+		sql +="SELECT * FROM borad WHERE id ="+ id +";";
+		
+		Map<String, Object> row = dbConnection.selectRow(sql);
+		Board board = new Board(row);
+		return board;
 	}
 
 	public List<Article> getArticles() {
@@ -1220,6 +1225,10 @@ class Board extends Dto {
 		this.code = code;
 	}
 
+	public Board(Map<String, Object> row) {
+		this.setId(int);
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -1261,7 +1270,6 @@ class Article extends Dto {
 		this.setRegDate(regDate);
 		this.setTitle((String) row.get("title"));
 		this.setBody((String) row.get("body"));
-		this.setMemberId((int) (long) row.get("memberId"));
 		this.setBoardId((int) (long) row.get("boardId"));
 	}
 
