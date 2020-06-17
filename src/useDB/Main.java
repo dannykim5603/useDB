@@ -537,9 +537,7 @@ class ArticleController extends Controller {
 		// 현재 게시판 id 가져오기
 		int boardId = Factory.getSession().getCurrentBoard().getId();
 
-		// 현재 로그인한 회원의 id 가져오기
-		int memberId = Factory.getSession().getLoginedMember().getId();
-		int newId = articleService.write(boardId, memberId, title, body);
+		int newId = articleService.write(boardId, title, body);
 
 		System.out.printf("%d번 글이 생성되었습니다.\n", newId);
 	}
@@ -789,8 +787,8 @@ class ArticleService {
 		return articleDao.getBoard(id);
 	}
 
-	public int write(int boardId, int memberId, String title, String body) {
-		Article article = new Article(boardId, memberId, title, body);
+	public int write(int boardId, String title, String body) {
+		Article article = new Article(boardId, title, body);
 		return articleDao.save(article);
 	}
 
@@ -1212,9 +1210,8 @@ class Article extends Dto {
 
 	}
 
-	public Article(int boardId, int memberId, String title, String body) {
+	public Article(int boardId, String title, String body) {
 		this.boardId = boardId;
-		this.memberId = memberId;
 		this.title = title;
 		this.body = body;
 	}
@@ -1264,8 +1261,7 @@ class Article extends Dto {
 
 	@Override
 	public String toString() {
-		return String.format("%n게시판 번호 : %s 회원 아이디 : %s%n게시 번호 : %s 게시 날짜 : %s%n제목 : %s%n내용 : %s%n%n ", boardId,
-				memberId, getId(), getRegDate(), title, body);
+		return String.format("%n게시판 번호 : %s%n게시 번호 : %s 게시 날짜 : %s%n제목 : %s%n내용 : %s%n%n ", boardId, getId(), getRegDate(), title, body);
 	}
 
 }
