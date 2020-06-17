@@ -360,9 +360,9 @@ class App {
 		Factory.getMemberService().join("admin", "admin", "관리자");
 
 		// 공지사항 게시판 생성
-		Factory.getArticleService().makeBoard("공지시항", "notice");
+		Factory.getArticleService().createBoard("공지시항", "notice");
 		// 자유 게시판 생성
-		Factory.getArticleService().makeBoard("자유게시판", "free");
+		Factory.getArticleService().createBoard("자유게시판", "free");
 
 		// 현재 게시판을 1번 게시판으로 선택
 		Factory.getSession().setCurrentBoard(Factory.getArticleService().getBoard(1));
@@ -514,6 +514,22 @@ class ArticleController extends Controller {
 				int num = Integer.parseInt(request.getArg1());
 				actionDelete(num);
 			}
+		} else if (request.getActionName().equals("makeboard")) {
+			System.out.printf("이름 : ");
+			String name = Factory.getScanner().nextLine();
+			System.out.printf("코드 : ");
+			String code = Factory.getScanner().nextLine();
+
+			actionCreateBoard(name, code);
+		}
+	}
+
+	private void actionCreateBoard(String name, String code) {
+		int a = articleService.createBoard(name, code);
+		if (a != -1) {
+		System.out.println(name + "게시판이 생성되었습니다.");
+		}else {
+			System.out.println("이미 존재하는 게시판 코드 입니다.");
 		}
 	}
 
@@ -752,6 +768,15 @@ class ArticleService {
 		articleDao = Factory.getArticleDao();
 	}
 
+	public int createBoard(String name, String code) {
+		boolean check = articleDao.checkBoardCode(code);
+
+		if (check == false) {
+			articleDao.createBoard(name, code);
+		}
+		return -1;
+	}
+
 	public void deleteArticleById(int num) {
 		articleDao.deleteArticleById(num);
 	}
@@ -795,7 +820,6 @@ class ArticleService {
 	public List<Article> getArticles() {
 		return articleDao.getArticles();
 	}
-
 }
 
 class MemberService {
@@ -824,7 +848,6 @@ class MemberService {
 		return memberDao.getMember(id);
 	}
 }
-
 // Dao
 class ArticleDao {
 	DB db;
@@ -835,13 +858,28 @@ class ArticleDao {
 		dbConnection = Factory.getDBConnection();
 	}
 
+	public boolean checkBoardCode(String code) {
+		String sql = "SELECT * FROM board WHERE `code` = '" + code + "';";
+
+		Map<String, Object> row = dbConnection.selectRow(sql);
+		if (row == null) {// 존재하면 true 존재하지 않으면 false.
+			return false;
+		}
+		return true;
+	}
+
+	public void createBoard(String name, String code) {
+		String sql = "INSERT INTO board SET regDate = NOW(), `name` = '" + name + "', `code` = '" + code + "';";
+		dbConnection.insert(sql);
+	}
+
 	public void modifyArticleById(int num, String title, String body) {
 		String sql = "UPDATE article ";
 		sql += "SET title = '" + title + "',";
 		sql += "`body` =' " + body + "' ";
 		sql += "WHERE id = " + num + ";";
 
-		Factory.getDBConnection().update(sql);
+		dbConnection.update(sql);
 
 		System.out.println(num + "번 글이 수정되었습니다.");
 	}
@@ -1261,7 +1299,8 @@ class Article extends Dto {
 
 	@Override
 	public String toString() {
-		return String.format("%n게시판 번호 : %s%n게시 번호 : %s 게시 날짜 : %s%n제목 : %s%n내용 : %s%n%n ", boardId, getId(), getRegDate(), title, body);
+		return String.format("%n게시판 번호 : %s%n게시 번호 : %s 게시 날짜 : %s%n제목 : %s%n내용 : %s%n%n ", boardId, getId(),
+				getRegDate(), title, body);
 	}
 
 }
