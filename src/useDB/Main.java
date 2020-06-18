@@ -573,7 +573,6 @@ class ArticleController extends Controller {
 		int a = articleService.checkBoard(name, code);
 		if (a == 1) {
 			System.out.println(name + "게시판이 생성되었습니다.");
-			articleService.createBoard(name, code);
 		} else {
 			System.out.println("이미 존재하는 게시판 코드 입니다.");
 		}
@@ -837,8 +836,13 @@ class ArticleService {
 		return 1;
 	}
 
-	public void createBoard(String name, String code) {
-		articleDao.createBoard(name, code);
+	public int createBoard(String name, String code) {
+		boolean check = articleDao.checkBoardCode(code);
+		if (check == false) {
+			articleDao.createBoard(name, code);
+			return 1;
+		}
+		return -1;
 	}
 
 	public void deleteArticleById(int num) {
