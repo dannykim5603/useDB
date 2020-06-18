@@ -272,10 +272,10 @@ class DBConnection {
 		}
 	}
 
-	public void getBoard(int i) {
-		String sql = "";
-		sql += "USE borad";
-		Factory.getDBConnection().insert(sql);
+
+	public void getBoards() {
+		// TODO Auto-generated method stub
+		
 	}
 }
 
@@ -570,9 +570,10 @@ class ArticleController extends Controller {
 	}
 
 	private void actionCreateBoard(String name, String code) {
-		int a = articleService.createBoard(name, code);
+		int a = articleService.checkBoard(name, code);
 		if (a == 1) {
 			System.out.println(name + "게시판이 생성되었습니다.");
+			articleService.createBoard(name, code);
 		} else {
 			System.out.println("이미 존재하는 게시판 코드 입니다.");
 		}
@@ -580,7 +581,6 @@ class ArticleController extends Controller {
 
 	private void actionList(Request reqeust) {
 		List<Article> articles = articleService.getArticles();
-
 		System.out.println("=== 게시물 리스트 시작 ===\n");
 		for (Article article : articles) {
 			System.out.printf("%d, %s, %s\n", article.getId(), article.getRegDate(), article.getTitle());
@@ -814,6 +814,15 @@ class ArticleService {
 		articleDao = Factory.getArticleDao();
 	}
 
+	public int checkBoard(String name, String code) {
+		boolean check = articleDao.checkBoardCode(code);
+
+		if (check == false) {
+			return 1;
+		}
+		return -1;
+	}
+
 	public void changeBoardById(int num) {
 		articleDao.changeBoardById(num);
 	}
@@ -828,14 +837,8 @@ class ArticleService {
 		return 1;
 	}
 
-	public int createBoard(String name, String code) {
-		boolean check = articleDao.checkBoardCode(code);
-
-		if (check == false) {
-			articleDao.createBoard(name, code);
-			return 1;
-		}
-		return -1;
+	public void createBoard(String name, String code) {
+		articleDao.createBoard(name, code);
 	}
 
 	public void deleteArticleById(int num) {
@@ -870,7 +873,7 @@ class ArticleService {
 	}
 
 	public Board getBoard(int id) {
-		return articleDao.getBoard(id);
+		return articleDao.getBoardById(id);
 	}
 
 	public int write(int boardId, String title, String body) {
@@ -921,7 +924,7 @@ class ArticleDao {
 	}
 
 	public void changeBoardById(int num) {
-		Board board = getBoard(num);
+		Board board = getBoardById(num);
 		Factory.getSession().setCurrentBoard(board);
 	}
 
@@ -979,12 +982,17 @@ class ArticleDao {
 	}
 
 	public List<Article> getArticlesByBoardCode(String code) {
-		return db.getArticlesByBoardCode(code);
+		List<Map<String, Object>> rows = dbConnection.selectRows("SELECT * FROM article ORDER by id DESC");
+		List<Article> articles = new ArrayList<>();
+
+		for (Map<String, Object> row : rows) {
+			if (code == ((String) row.get("code"))) {
+				articles.add(new Article(row));
+			}
+		}
+		return articles;
 	}
 
-	public List<Board> getBoards() {
-		return db.getBoards();
-	}
 
 	public Board getBoardByCode(String code) {
 		return db.getBoardByCode(code);
@@ -1011,8 +1019,24 @@ class ArticleDao {
 		return dbConnection.insert(sql);
 	}
 
-	public Board getBoard(int id) {
-		return db.getBoard(id);
+	public Board getBoardById(int id) {
+		String sql = "SELECT * FROM board ";
+		sql += "WHERE id = " + id + ";";
+		Map<String, Object> row = dbConnection.selectRow(sql);
+		Board board = new Board(row);
+
+		return board;
+	}
+	
+	public List<Board> getBoards() {
+		List<Map<String, Object>> rows = dbConnection.selectRows("SELECT * FROM article ORDER by id DESC");
+		List<Board> boards = new ArrayList<>();
+		
+		for (Map<String, Object> row : rows) {
+			boards.add(new Board(row));
+		}
+		return boards;
+		
 	}
 
 	public List<Article> getArticles() {
@@ -1027,10 +1051,7 @@ class ArticleDao {
 		}
 
 		return articles;
-
-		// return db.getArticles();
 	}
-
 }
 
 class MemberDao {
