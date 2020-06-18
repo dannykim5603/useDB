@@ -87,6 +87,28 @@ class DBConnection {
 		}
 	}
 
+	public void DBnT() {
+		String sql = 
+				"CREATE DATABASE site5;" + 
+				"USE site5;" + 
+				"CREATE TABLE article" + 
+				"    id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT," + 
+				"    regDate DATETIME NOT NULL," + 
+				"    title CHAR(100) NOT NULL," + 
+				"    `body` TEXT NOT NULL," + 
+				"    memberId INT(10) UNSIGNED NOT NULL," + 
+				"    boardId INT(10) UNSIGNED NOT NULL" + 
+				");" + 
+				"" + 
+				"CREATE TABLE board" + 
+				"	id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT," + 
+				"	regDate DATETIME NOT NULL," + 
+				"	`name` CHAR(100) NOT NULL," + 
+				"	`code` CHAR(100) NOT NULL" + 
+				");";
+		insert(sql);
+	}
+
 	public int selectRowIntValue(String sql) {
 		Map<String, Object> row = selectRow(sql);
 
@@ -543,13 +565,13 @@ class ArticleController extends Controller {
 		int a = articleService.checkBoardId(num);
 		if (a == 1) {
 			articleService.changeBoardById(num);
-			System.out.println(" === "+Factory.getSession().getCurrentBoard().getName() + " === ");
+			System.out.println(" === " + Factory.getSession().getCurrentBoard().getName() + " === ");
 		}
 	}
 
 	private void actionCreateBoard(String name, String code) {
 		int a = articleService.createBoard(name, code);
-		if (a != -1) {
+		if (a == 1) {
 			System.out.println(name + "게시판이 생성되었습니다.");
 		} else {
 			System.out.println("이미 존재하는 게시판 코드 입니다.");
@@ -798,11 +820,11 @@ class ArticleService {
 
 	public int checkBoardId(int num) {
 		boolean check = articleDao.checkBoardId(num);
-		
+
 		if (check == false) {
 			System.out.println("존재하지 않는 번호의 게시판 입니다.");
 		}
-		
+
 		return 1;
 	}
 
@@ -811,6 +833,7 @@ class ArticleService {
 
 		if (check == false) {
 			articleDao.createBoard(name, code);
+			return 1;
 		}
 		return -1;
 	}
@@ -916,7 +939,7 @@ class ArticleDao {
 		String sql = "SELECT * FROM board WHERE `code` = '" + code + "';";
 
 		Map<String, Object> row = dbConnection.selectRow(sql);
-		if (row == null) {// 존재하면 true 존재하지 않으면 false.
+		if (((String) row.get("code")) == null) {// 존재하면 true 존재하지 않으면 false.
 			return false;
 		}
 		return true;
@@ -996,10 +1019,10 @@ class ArticleDao {
 		List<Map<String, Object>> rows = dbConnection.selectRows("SELECT * FROM article ORDER by id DESC");
 		List<Article> articles = new ArrayList<>();
 		int id = Factory.getSession().getCurrentBoard().getId();
-		
+
 		for (Map<String, Object> row : rows) {
-			if ( id == ((int) (long) row.get("boardId"))) {
-			articles.add(new Article(row));
+			if (id == ((int) (long) row.get("boardId"))) {
+				articles.add(new Article(row));
 			}
 		}
 
