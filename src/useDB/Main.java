@@ -88,24 +88,12 @@ class DBConnection {
 	}
 
 	public void DBnT() {
-		String sql = 
-				"CREATE DATABASE site5;" + 
-				"USE site5;" + 
-				"CREATE TABLE article" + 
-				"    id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT," + 
-				"    regDate DATETIME NOT NULL," + 
-				"    title CHAR(100) NOT NULL," + 
-				"    `body` TEXT NOT NULL," + 
-				"    memberId INT(10) UNSIGNED NOT NULL," + 
-				"    boardId INT(10) UNSIGNED NOT NULL" + 
-				");" + 
-				"" + 
-				"CREATE TABLE board" + 
-				"	id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT," + 
-				"	regDate DATETIME NOT NULL," + 
-				"	`name` CHAR(100) NOT NULL," + 
-				"	`code` CHAR(100) NOT NULL" + 
-				");";
+		String sql = "CREATE DATABASE site5;" + "USE site5;" + "CREATE TABLE article"
+				+ "    id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT," + "    regDate DATETIME NOT NULL,"
+				+ "    title CHAR(100) NOT NULL," + "    `body` TEXT NOT NULL,"
+				+ "    memberId INT(10) UNSIGNED NOT NULL," + "    boardId INT(10) UNSIGNED NOT NULL" + ");" + ""
+				+ "CREATE TABLE board" + "	id INT(10) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,"
+				+ "	regDate DATETIME NOT NULL," + "	`name` CHAR(100) NOT NULL," + "	`code` CHAR(100) NOT NULL" + ");";
 		insert(sql);
 	}
 
@@ -272,10 +260,9 @@ class DBConnection {
 		}
 	}
 
-
 	public void getBoards() {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
 
@@ -558,7 +545,19 @@ class ArticleController extends Controller {
 				int num = Integer.parseInt(request.getArg1());
 				actionChangeBoard(num);
 			}
+		} else if (request.getActionName().equals("listboard")) {
+			actionListBoard();
 		}
+	}
+
+	private void actionListBoard() {
+		List<Board> boards = articleService.listBoard();
+		System.out.println(" == 보드 리스트 == ");
+		for (Board board : boards ) {
+			System.out.printf(" 번호 : %d%n 이름 : %s%n 코드 : %s%n",board.getId(),board.getName(),board.getCode());
+		}
+		System.out.println(" == 보드 리스트 끝 ==");
+			
 	}
 
 	private void actionChangeBoard(int num) {
@@ -813,6 +812,10 @@ class ArticleService {
 		articleDao = Factory.getArticleDao();
 	}
 
+	public List<Board> listBoard() {
+		return articleDao.listBoard();
+	}
+
 	public int checkBoard(String name, String code) {
 		boolean check = articleDao.checkBoardCode(code);
 
@@ -927,6 +930,16 @@ class ArticleDao {
 		dbConnection = Factory.getDBConnection();
 	}
 
+	public List<Board> listBoard() {
+		List<Map<String, Object>> rows = dbConnection.selectRows("SELECT * FROM board ORDER by id DESC");
+		List<Board> boards = new ArrayList<>();
+
+		for (Map<String, Object> row : rows) {
+			boards.add(new Board(row));
+		}
+		return boards;
+	}
+
 	public void changeBoardById(int num) {
 		Board board = getBoardById(num);
 		Factory.getSession().setCurrentBoard(board);
@@ -997,7 +1010,6 @@ class ArticleDao {
 		return articles;
 	}
 
-
 	public Board getBoardByCode(String code) {
 		return db.getBoardByCode(code);
 	}
@@ -1031,16 +1043,16 @@ class ArticleDao {
 
 		return board;
 	}
-	
+
 	public List<Board> getBoards() {
-		List<Map<String, Object>> rows = dbConnection.selectRows("SELECT * FROM article ORDER by id DESC");
+		List<Map<String, Object>> rows = dbConnection.selectRows("SELECT * FROM board ORDER by id DESC");
 		List<Board> boards = new ArrayList<>();
-		
+
 		for (Map<String, Object> row : rows) {
 			boards.add(new Board(row));
 		}
 		return boards;
-		
+
 	}
 
 	public List<Article> getArticles() {

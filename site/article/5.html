@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>whaaaaat?</title>
+  <style>
+    body,
+    body,
+    ul,
+    li {
+      margin: 0%;
+      padding: 0%;
+      list-style: none;
+    }
+
+    body {
+      background-image: url("https://i.pinimg.com/originals/85/28/a8/8528a8d1722dabfe66424c870a995006.jpg");
+    }
+
+    a {
+      text-decoration: none;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 7px;
+    }
+
+    .menu-box-1 {
+      position: relative;
+      top: 100px;
+      bottom: auto;
+      text-align: center;
+    }
+
+    .menu-box-1 ul {
+      display: inline-block;
+      /* border: white solid 2px; */
+    }
+
+    .menu-box-1 ul>li {
+      display: inline-block;
+      position: relative;
+      padding: 0 10px;
+    }
+
+    .menu-box-1 ul ul {
+      display: none;
+      position: absolute;
+      top: 0;
+    }
+
+    .menu-box-1 ul>li>a {
+      transition: 0.2s;
+      display: block;
+      padding: 10px;
+      width: 250px;
+    }
+
+    .menu-box-1 ul>li:hover>a {
+      color: black;
+      transition: 0.5s opacity 1s;
+      /* width: 150px; */
+    }
+
+    .menu-box-1 ul>li:hover>ul {
+      display: block;
+      top: 100%;
+      right: 0;
+      left: auto;
+    }
+
+  </style>
+</head>
+
+<body>
+  <nav class="menu-box-1">
+    <ul>
+      <li>
+        <a href="../home/index.html">홈</a>
+      </li>
+      <li>
+        <a href="#">게시판</a>
+        <ul>
+          <li><a href="../../site/article/notice-list-1.html">공지 게시판</a></li>
+          <li><a href="../../site/article/free-list-1.html">자유 게시판</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">통계</a>
+      </li>
+      <li>
+        <a href="#">개발자 블로그</a>
+        <ul>
+          <li>
+            <a href="https://to2.kr/bfp" target="_blank">이상범 블로그</a>
+          </li>
+          <li>
+            <a href="https://to2.kr/bfe" target="_blank">김동연 블로그</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+<div class = view >
+    <div class = article-header>haha</div><div class = article-content>haha</div><div class = header><div class = before><a href="4.html">이전글</a></div><div class = after><a href="6.html">다음글</a></div></div class>
+
+      <style>
+        .view {
+            color: white;
+            position : absolute;
+            width: 60%;
+            height: auto;
+            margin-left: auto;
+            margin-right: auto;
+            top: 30%;
+            bottom: auto;
+            left:20%;
+        }
+        .view > .article-header {
+            text-align: center;
+            font-size: 2rem;
+            padding-bottom: 150px;
+            margin-bottom: 50px;
+        }
+        .view > .article-content{
+            text-align: center;
+
+        }
+        .view > .header {
+
+            position: relative;
+            margin-top: 30%;
+            /* top:90%; */
+        }
+        .view > .header > .before{
+            position: absolute;
+            display: inline-block;
+            right: auto;
+            left: auto;
+        }
+        .view > .header > .after{
+            position: absolute;
+            right: 0;
+            left: auto;
+            display: inline-block;
+        }
+    </style>
+</div>
+
+
+    </body>
+</html>
