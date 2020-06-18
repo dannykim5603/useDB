@@ -249,6 +249,12 @@ class DBConnection {
 			System.err.println("[닫기 오류]\n" + e.getStackTrace());
 		}
 	}
+
+	public void getBoard(int i) {
+		String sql = "";
+		sql += "USE borad";
+		Factory.getDBConnection().insert(sql);
+	}
 }
 
 // Factory
@@ -366,6 +372,8 @@ class App {
 
 		// 현재 게시판을 1번 게시판으로 선택
 		Factory.getSession().setCurrentBoard(Factory.getArticleService().getBoard(1));
+		Board board = Factory.getSession().getCurrentBoard();
+		System.out.println("=== " + board.getName() + "===");
 		// 임시 : 현재 로그인 된 회원은 1번 회원으로 지정, 이건 나중에 회원가입, 로그인 추가되면 제거해야함
 		Factory.getSession().setLoginedMember(Factory.getMemberService().getMember(1));
 	}
@@ -521,14 +529,29 @@ class ArticleController extends Controller {
 			String code = Factory.getScanner().nextLine();
 
 			actionCreateBoard(name, code);
+		} else if (request.getActionName().equals("changeboard")) {
+			if (request.getArg1() == null) {
+				System.out.println("게시판 번호를 입력해 주세요.");
+			} else {
+				int num = Integer.parseInt(request.getArg1());
+				actionChangeBoard(num);
+			}
+		}
+	}
+
+	private void actionChangeBoard(int num) {
+		int a = articleService.checkBoardId(num);
+		if (a == 1) {
+			articleService.changeBoardById(num);
+			System.out.println(" === "+Factory.getSession().getCurrentBoard().getName() + " === ");
 		}
 	}
 
 	private void actionCreateBoard(String name, String code) {
 		int a = articleService.createBoard(name, code);
 		if (a != -1) {
-		System.out.println(name + "게시판이 생성되었습니다.");
-		}else {
+			System.out.println(name + "게시판이 생성되었습니다.");
+		} else {
 			System.out.println("이미 존재하는 게시판 코드 입니다.");
 		}
 	}
@@ -559,7 +582,7 @@ class ArticleController extends Controller {
 	}
 
 	private void actionDelete(int num) {
-		
+
 		articleService.deleteArticleById(num);
 	}
 
@@ -769,6 +792,20 @@ class ArticleService {
 		articleDao = Factory.getArticleDao();
 	}
 
+	public void changeBoardById(int num) {
+		articleDao.changeBoardById(num);
+	}
+
+	public int checkBoardId(int num) {
+		boolean check = articleDao.checkBoardId(num);
+		
+		if (check == false) {
+			System.out.println("존재하지 않는 번호의 게시판 입니다.");
+		}
+		
+		return 1;
+	}
+
 	public int createBoard(String name, String code) {
 		boolean check = articleDao.checkBoardCode(code);
 
@@ -849,6 +886,7 @@ class MemberService {
 		return memberDao.getMember(id);
 	}
 }
+
 // Dao
 class ArticleDao {
 	DB db;
@@ -857,6 +895,21 @@ class ArticleDao {
 	ArticleDao() {
 		db = Factory.getDB(); // 나중에 없어질
 		dbConnection = Factory.getDBConnection();
+	}
+
+	public void changeBoardById(int num) {
+		Board board = getBoard(num);
+		Factory.getSession().setCurrentBoard(board);
+	}
+
+	public boolean checkBoardId(int num) {
+		String sql = "SELECT * FROM board WHERE `id` = '" + num + "';";
+
+		Map<String, Object> row = dbConnection.selectRow(sql);
+		if (row == null) {// 존재하면 true 존재하지 않으면 false.
+			return false;
+		}
+		return true;
 	}
 
 	public boolean checkBoardCode(String code) {
@@ -915,7 +968,13 @@ class ArticleDao {
 	}
 
 	public int saveBoard(Board board) {
-		return db.saveBoard(board);
+		String sql = "";
+		sql += "INSERT INTO article ";
+		sql += String.format("SET regDate = '%s'", board.getRegDate());
+		sql += String.format(", name = '%s'", board.getName());
+		sql += String.format(", `code` = '%s'", board.getCode());
+
+		return dbConnection.insert(sql);
 	}
 
 	public int save(Article article) {
@@ -930,20 +989,18 @@ class ArticleDao {
 	}
 
 	public Board getBoard(int id) {
-		String sql = "";
-		sql +="SELECT * FROM borad WHERE id ="+ id +";";
-		
-		Map<String, Object> row = dbConnection.selectRow(sql);
-		Board board = new Board(row);
-		return board;
+		return db.getBoard(id);
 	}
 
 	public List<Article> getArticles() {
 		List<Map<String, Object>> rows = dbConnection.selectRows("SELECT * FROM article ORDER by id DESC");
 		List<Article> articles = new ArrayList<>();
-
+		int id = Factory.getSession().getCurrentBoard().getId();
+		
 		for (Map<String, Object> row : rows) {
+			if ( id == ((int) (long) row.get("boardId"))) {
 			articles.add(new Article(row));
+			}
 		}
 
 		return articles;
@@ -1227,11 +1284,15 @@ class Board extends Dto {
 
 	public Board(Map<String, Object> row) {
 		this.setId((int) (long) row.get("id"));
-
 		String regDate = row.get("regDate") + "";
 		this.setRegDate(regDate);
 		this.setName((String) row.get("name"));
 		this.setCode((String) row.get("code"));
+	}
+
+	@Override
+	public String toString() {
+		return String.format("%nname=%s code=%s%n getId()=%s getRegDate()=%s%n%n", name, code, getId(), getRegDate());
 	}
 
 	public String getName() {
@@ -1270,7 +1331,6 @@ class Article extends Dto {
 
 	public Article(Map<String, Object> row) {
 		this.setId((int) (long) row.get("id"));
-
 		String regDate = row.get("regDate") + "";
 		this.setRegDate(regDate);
 		this.setTitle((String) row.get("title"));
